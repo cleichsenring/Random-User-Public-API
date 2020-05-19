@@ -9,8 +9,8 @@ Chris Leichsenring
 //Global variables
 const galleryDiv = document.getElementById('gallery');
 const body = document.querySelector('body');
-
 let users = []
+let activeUsers = []
 //Random user fetch
 //Image, First Last Name, Email, City or location, cell, detailed address, birthday
 const randomAPI = fetch('https://randomuser.me/api/?results=12&nat=US')
@@ -18,11 +18,11 @@ const randomAPI = fetch('https://randomuser.me/api/?results=12&nat=US')
   .then(data => {
     data.results.map(user => {
       users.push(user);
+      activeUsers.push(user);
       createCard(user, users.length-1);
     });
     }
   );
-  //.then(users.forEach((user, index) => createCard(user, index)))
 
 
 //Gallery
@@ -43,15 +43,15 @@ const createCard = (user, index) => {
   `;
   div.innerHTML = data;
   galleryDiv.appendChild(div);
-  div.addEventListener('click', (e) => {
-    updateModal(users[index], index);
-  })
+  div.addEventListener('click', (e) => updateModal(index));
 }
 
 
 
 
-//Modal
+/**
+ * Creates empty hidden modal view and appends to body
+ */
 const createModal = () => { 
   const container = document.createElement('div');
   const div = document.createElement('div');
@@ -96,9 +96,9 @@ const createModal = () => {
 createModal();
 
 
-const updateModal = (user, index) => {
+const updateModal = index => {
   document.querySelector('.modal-container').style.display = ''
-
+  const user = activeUsers[index];
   const birthday = new Date(user.dob.date);
   document.querySelector('.modal-img').src = user.picture.large;
   document.querySelector('.modal-name').innerHTML = `${user.name.first} ${user.name.last}`;
@@ -106,13 +106,12 @@ const updateModal = (user, index) => {
   document.querySelector('#city').innerHTML = user.location.city;
   document.querySelector('#phone').innerHTML = user.cell;
   document.querySelector('#address').innerHTML = `${user.location.street.number} ${user.location.street.name} <br> ${user.location.city}, ${user.location.state} ${user.location.postcode}`
-//Update/fix State abbrevse
   document.querySelector('.modal-info-container').setAttribute('user-index', index )
   document.querySelector('#dob').innerHTML = `Birthday: ${birthday.toLocaleDateString()}`;
 }
 
 
-//Search bar
+// Selects search container and appends search box
 const searchDiv = document.querySelector('.search-container');
 searchDiv.innerHTML = `
 <form action="#" method="get">
@@ -121,17 +120,38 @@ searchDiv.innerHTML = `
 </form>
 `;
 
+const searchUser = search => {
+activeUsers = []
+const cards = document.querySelectorAll('.card').forEach(card => card.remove());
+users.forEach(user => {
+  const name = `${user.name.first} ${user.name.last}`
+  if(search.length !== 0 && name.toLowerCase().includes(search)){
+    activeUsers.push(user);
+  }
+});
+
+if(activeUsers.length > 0) {
+  console.log(activeUsers)
+} else {
+  console.log('No user found')
+}
+}
+
+
+
+
+
+
+
+
+
   //Event listeners
 
 document.getElementById('modal-prev').addEventListener('click', () => {
   const currentIndex = parseInt(document.querySelector('.modal-info-container').getAttribute('user-index'), 10)
-  currentIndex === 0 ? updateModal(users[users.length  - 1], users.length - 1) : updateModal(users[currentIndex - 1] , currentIndex - 1);
+  currentIndex === 0 ? updateModal(activeUsers.length - 1) : updateModal(currentIndex - 1);
 });
 document.getElementById('modal-next').addEventListener('click', () => {
   const currentIndex = parseInt(document.querySelector('.modal-info-container').getAttribute('user-index'), 10);
-  currentIndex === users.length - 1 ? updateModal(users[0], 0) : updateModal(users[currentIndex + 1] , currentIndex+1);
-});
-
-searchDiv.addEventListener('submit', e => {
-
+  currentIndex === activeUsers.length - 1 ? updateModal(0) : updateModal(currentIndex + 1);
 });
