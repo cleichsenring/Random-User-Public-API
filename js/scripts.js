@@ -4,28 +4,36 @@ FSJS project 5 - Public API Requests
 Chris Leichsenring
 ******************************************/
 
-
+// Selects search container and appends search box
+const searchDiv = document.querySelector('.search-container');
+searchDiv.innerHTML = `
+<form action="#" method="get">
+  <input type="search" id="search-input" class="search-input" placeholder="Search...">
+  <input type="submit" value="&#x1F50D;" id="search-submit" class="search-submit">
+</form>
+`;
 
 //Global variables
 const galleryDiv = document.getElementById('gallery');
 const body = document.querySelector('body');
-let users = []
-let activeUsers = []
-//Random user fetch
-//Image, First Last Name, Email, City or location, cell, detailed address, birthday
+const searchInput = document.querySelector('.search-input');
+let users = [];
+let activeUsers = [];
+
+/**
+ * 
+ */
 const randomAPI = fetch('https://randomuser.me/api/?results=12&nat=US')
   .then(res => res.json())
-  .then(data => {
-    data.results.map(user => {
-      users.push(user);
-      activeUsers.push(user);
-      createCard(user, users.length-1);
-    });
-    }
-  );
+  .then(data => data.results.map(user => users.push(user)))
+  .then(() => createUsers(users));
 
 
-//Gallery
+/**
+ * UPDATE ME
+ * @param {array} user 
+ * @param {int} index 
+ */
 const createCard = (user, index) => {
   const div = document.createElement('div');
   div.className = 'card';
@@ -46,8 +54,16 @@ const createCard = (user, index) => {
   div.addEventListener('click', (e) => updateModal(index));
 }
 
-
-
+/**
+ * UPDATE ME
+ * @param {array} array 
+ */
+const createUsers = array => {
+  array.map(user => {
+    activeUsers.push(user);
+    createCard(user, activeUsers.length-1);
+  })
+}
 
 /**
  * Creates empty hidden modal view and appends to body
@@ -87,15 +103,15 @@ const createModal = () => {
   container.appendChild(buttonDiv);
   body.appendChild(container);
 
-//Event listeners
-  document.getElementById('modal-close-btn').addEventListener('click', e => {
-    container.style.display = 'none';
-  });
-
+//Event listener to close modal view
+  document.getElementById('modal-close-btn').addEventListener('click', () => container.style.display = 'none');
 }
 createModal();
 
-
+/**
+ * UPDATE ME
+ * @param {int} index 
+ */
 const updateModal = index => {
   document.querySelector('.modal-container').style.display = ''
   const user = activeUsers[index];
@@ -110,43 +126,33 @@ const updateModal = index => {
   document.querySelector('#dob').innerHTML = `Birthday: ${birthday.toLocaleDateString()}`;
 }
 
-
-// Selects search container and appends search box
-const searchDiv = document.querySelector('.search-container');
-searchDiv.innerHTML = `
-<form action="#" method="get">
-  <input type="search" id="search-input" class="search-input" placeholder="Search...">
-  <input type="submit" value="&#x1F50D;" id="search-submit" class="search-submit">
-</form>
-`;
-
+/**
+ * Searches and displays users that match input string
+ * @param {string} search name to search
+ */
 const searchUser = search => {
-activeUsers = []
-const cards = document.querySelectorAll('.card').forEach(card => card.remove());
-users.forEach(user => {
-  const name = `${user.name.first} ${user.name.last}`
-  if(search.length !== 0 && name.toLowerCase().includes(search)){
-    activeUsers.push(user);
+  activeUsers = []
+  const buttonContainer = document.querySelector('.modal-btn-container')
+  const cards = document.querySelectorAll('.card').forEach(card => card.remove());
+  users.forEach(user => {
+    const name = `${user.name.first} ${user.name.last}`
+    if(search.length !== 0 && name.toLowerCase().includes(search)){
+      activeUsers.push(user);
+      createCard(user, activeUsers.length - 1)
+    }
+  });
+
+//If no users are found displays error. If only one user found hides modal Prev/Next buttons
+  if(!activeUsers.length > 0) {
+    console.log('No user found');//TODO add error message
+  } else if(activeUsers.length === 1){
+    buttonContainer.style.display = 'none'
+  } else {
+    buttonContainer.style.display = ''
   }
-});
-
-if(activeUsers.length > 0) {
-  console.log(activeUsers)
-} else {
-  console.log('No user found')
-}
 }
 
-
-
-
-
-
-
-
-
-  //Event listeners
-
+//Event listeners for modal Prev & Next buttons
 document.getElementById('modal-prev').addEventListener('click', () => {
   const currentIndex = parseInt(document.querySelector('.modal-info-container').getAttribute('user-index'), 10)
   currentIndex === 0 ? updateModal(activeUsers.length - 1) : updateModal(currentIndex - 1);
@@ -155,3 +161,7 @@ document.getElementById('modal-next').addEventListener('click', () => {
   const currentIndex = parseInt(document.querySelector('.modal-info-container').getAttribute('user-index'), 10);
   currentIndex === activeUsers.length - 1 ? updateModal(0) : updateModal(currentIndex + 1);
 });
+
+//Search event listeners. If search box is event show default user list
+searchInput.addEventListener('keyup', e => searchInput.value ? searchUser(e.target.value) : createUsers(users) ) ;
+document.getElementById('search-submit').addEventListener('click', () => searchInput.value ? searchUser(searchInput.value) : createUsers(users) );
