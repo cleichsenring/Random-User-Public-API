@@ -28,18 +28,17 @@ searchError.style.display = 'none';
 body.appendChild(searchError);
 
 /**
- * UPDATE ME
+ * Fetching list of 12 users from Random User API and creating a card view
  */
 const randomAPI = fetch('https://randomuser.me/api/?results=12&nat=US')
   .then(res => res.json())
   .then(data => data.results.map(user => users.push(user)))
   .then(() => createUsers(users));
 
-
 /**
- * UPDATE ME
- * @param {array} user 
- * @param {int} index 
+ * Generates card div element for each employee and appends to gallery. Contains eventListener() to update modal based on which user card is clicked
+ * @param {array} user Contains all data for a specific user
+ * @param {int} index User position within active array. Used to update modal view
  */
 const createCard = (user, index) => {
   const div = document.createElement('div');
@@ -59,11 +58,11 @@ const createCard = (user, index) => {
   div.innerHTML = data;
   galleryDiv.appendChild(div);
   div.addEventListener('click', () => updateModal(index));
-}
+};
 
 /**
- * UPDATE ME
- * @param {array} array 
+ * Maps an array of users to activeUsers array and creates cars for each user
+ * @param {array} array Contains array for each user to be displayed
  */
 const createUsers = array => {
   array.map(user => {
@@ -116,8 +115,8 @@ const createModal = () => {
 createModal();
 
 /**
- * UPDATE ME
- * @param {int} index 
+ * Shows modal view and updates with user information
+ * @param {int} index Array index for user from activeUsers array to be displayed within modal view
  */
 const updateModal = index => {
   document.querySelector('.modal-container').style.display = ''
@@ -161,7 +160,7 @@ const searchUser = search => {
   }
 }
 
-//Event listeners for modal Prev & Next buttons
+// Event listeners for modal Prev & Next buttons
 document.getElementById('modal-prev').addEventListener('click', () => {
   const currentIndex = parseInt(document.querySelector('.modal-info-container').getAttribute('user-index'), 10)
   currentIndex === 0 ? updateModal(activeUsers.length - 1) : updateModal(currentIndex - 1);
@@ -171,6 +170,8 @@ document.getElementById('modal-next').addEventListener('click', () => {
   currentIndex === activeUsers.length - 1 ? updateModal(0) : updateModal(currentIndex + 1);
 });
 
-//Search event listeners. If search box is event show default user list
+/**
+ * Search event listeners. If search box is empty show default user list
+ */
 searchInput.addEventListener('keyup', e => searchInput.value ? searchUser(e.target.value) : createUsers(users));
 document.getElementById('search-submit').addEventListener('click', () => searchInput.value ? searchUser(searchInput.value) : createUsers(users));
