@@ -62,6 +62,24 @@ header h1 {
     border: 1px solid rgba(50, 50, 50, 0.9);
 }
 
+/* ===================================== 
+   Updated CSS
+   * Search error message red
+   *
+  
+======================================== */
+#search-error {
+    color: red;
+}
+
+.card:hover {
+    background-color: lightgrey;
+}
+.modal-img:active {
+    transform: rotate(35deg);
+}
+
+
 
 /* ===================================== 
    Gallery
@@ -152,7 +170,7 @@ header h1 {
     right: 15px;
     cursor: pointer;
     color: rgba(255, 255, 255, 0.9);
-    background: rgba(0, 0, 0, 0.8);
+    background: rgba(255, 0, 0, 0.8);
     outline: none;
     border-radius: 0.25em;
     border: 1px solid rgba(50, 50, 50, 0.3);
