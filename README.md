@@ -1,5 +1,5 @@
 # Random User API Directory
-FSTD Project 5. 
+FSTD Project 5. Fetching and displaying random user data from an API
 
 
 ### Made with:
