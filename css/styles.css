@@ -76,7 +76,7 @@ header h1 {
     background-color: lightgrey;
 }
 .modal-img:active {
-    transform: rotate(35deg);
+    transform: rotate(30deg);
 }
 
 
