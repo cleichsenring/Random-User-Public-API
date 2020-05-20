@@ -20,8 +20,15 @@ const searchInput = document.querySelector('.search-input');
 let users = [];
 let activeUsers = [];
 
+//Creates no user found search error message. Appended to body and hidden by default
+const searchError = document.createElement('h2');
+searchError.innerText = 'Employee not found. Please try a different name';
+searchError.id = 'search-error';
+searchError.style.display = 'none';
+body.appendChild(searchError);
+
 /**
- * 
+ * UPDATE ME
  */
 const randomAPI = fetch('https://randomuser.me/api/?results=12&nat=US')
   .then(res => res.json())
@@ -51,7 +58,7 @@ const createCard = (user, index) => {
   `;
   div.innerHTML = data;
   galleryDiv.appendChild(div);
-  div.addEventListener('click', (e) => updateModal(index));
+  div.addEventListener('click', () => updateModal(index));
 }
 
 /**
@@ -121,14 +128,14 @@ const updateModal = index => {
   document.querySelector('#email').innerHTML = user.email;
   document.querySelector('#city').innerHTML = user.location.city;
   document.querySelector('#phone').innerHTML = user.cell;
-  document.querySelector('#address').innerHTML = `${user.location.street.number} ${user.location.street.name} <br> ${user.location.city}, ${user.location.state} ${user.location.postcode}`
+  document.querySelector('#address').innerHTML = `${user.location.street.number} ${user.location.street.name}, ${user.location.city}, ${user.location.state} ${user.location.postcode}`
   document.querySelector('.modal-info-container').setAttribute('user-index', index )
   document.querySelector('#dob').innerHTML = `Birthday: ${birthday.toLocaleDateString()}`;
 }
 
 /**
  * Searches and displays users that match input string
- * @param {string} search name to search
+ * @param {string} search user name to search
  */
 const searchUser = search => {
   activeUsers = []
@@ -144,11 +151,13 @@ const searchUser = search => {
 
 //If no users are found displays error. If only one user found hides modal Prev/Next buttons
   if(!activeUsers.length > 0) {
-    console.log('No user found');//TODO add error message
+    searchError.style.display = '';
   } else if(activeUsers.length === 1){
     buttonContainer.style.display = 'none'
+    searchError.style.display = 'none';
   } else {
     buttonContainer.style.display = ''
+    searchError.style.display = 'none';
   }
 }
 
@@ -163,5 +172,5 @@ document.getElementById('modal-next').addEventListener('click', () => {
 });
 
 //Search event listeners. If search box is event show default user list
-searchInput.addEventListener('keyup', e => searchInput.value ? searchUser(e.target.value) : createUsers(users) ) ;
-document.getElementById('search-submit').addEventListener('click', () => searchInput.value ? searchUser(searchInput.value) : createUsers(users) );
+searchInput.addEventListener('keyup', e => searchInput.value ? searchUser(e.target.value) : createUsers(users));
+document.getElementById('search-submit').addEventListener('click', () => searchInput.value ? searchUser(searchInput.value) : createUsers(users));
